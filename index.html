@@ -1,0 +1,1723 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Demo Widget</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --card: rgba(255, 255, 255, 0.08);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.7);
+        --accent: #6ae4ff;
+        --accent2: #a78bfa;
+      }
+
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: radial-gradient(1200px 700px at 20% 10%, rgba(167, 139, 250, 0.35), transparent 60%),
+          radial-gradient(900px 500px at 80% 0%, rgba(106, 228, 255, 0.25), transparent 55%),
+          linear-gradient(180deg, #070b14 0%, var(--bg) 100%);
+        color: var(--text);
+        overflow: hidden;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 0.95em;
+      }
+
+      /* Template */
+      #template {
+        height: 100%;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .wrap {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 26px 20px 70px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        padding: 14px 0;
+        backdrop-filter: blur(10px);
+        background: linear-gradient(180deg, rgba(7, 11, 20, 0.86) 0%, rgba(7, 11, 20, 0.62) 100%);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        min-width: 0;
+      }
+
+      .logo {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(106, 228, 255, 0.9), rgba(167, 139, 250, 0.9));
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      }
+
+      .brandText {
+        display: grid;
+        line-height: 1.15;
+      }
+
+      .brandText strong {
+        letter-spacing: 0.2px;
+      }
+
+      .brandText span {
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 13px;
+      }
+
+      .navLinks {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        color: rgba(255, 255, 255, 0.76);
+      }
+
+      .navLinks a {
+        text-decoration: none;
+        padding: 8px 10px;
+        border-radius: 10px;
+      }
+
+      .navLinks a:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.92);
+      }
+
+      .navRight {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pill {
+        padding: 10px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        padding: 12px 14px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .btn.primary {
+        border: none;
+        background: linear-gradient(135deg, rgba(106, 228, 255, 0.92), rgba(167, 139, 250, 0.92));
+        color: #06101a;
+      }
+
+      .btn.small {
+        padding: 10px 12px;
+        border-radius: 11px;
+        font-weight: 700;
+      }
+
+      .btn:active {
+        transform: translateY(1px);
+      }
+
+      .form {
+        margin-top: 18px;
+      }
+
+      .field {
+        display: grid;
+        gap: 10px;
+      }
+
+      .label {
+        font-weight: 700;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.86);
+      }
+
+      .inputRow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .input {
+        flex: 1;
+        min-width: min(520px, 100%);
+        height: 44px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.05);
+        color: rgba(255, 255, 255, 0.92);
+        padding: 0 14px;
+        font-size: 14px;
+      }
+
+      .input::placeholder {
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .help {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.62);
+        line-height: 1.45;
+      }
+
+      .hero {
+        padding-top: 22px;
+      }
+
+      .heroGrid {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 22px;
+        align-items: start;
+      }
+
+      @media (max-width: 980px) {
+        .navLinks {
+          display: none;
+        }
+
+        .heroGrid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(10px);
+      }
+
+      .card.soft {
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      h1 {
+        font-size: clamp(34px, 4.2vw, 56px);
+        margin: 0 0 12px;
+        letter-spacing: -0.025em;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 20px;
+      }
+
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .lead {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .ctaRow {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+
+      .checks {
+        margin-top: 16px;
+        display: grid;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 14px;
+      }
+
+      .checkItem {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+      }
+
+      .checkDot {
+        width: 22px;
+        height: 22px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        display: grid;
+        place-items: center;
+        flex-shrink: 0;
+      }
+
+      .trust {
+        margin-top: 16px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      @media (max-width: 980px) {
+        .trust {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      .stat {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 16px;
+        padding: 14px;
+      }
+
+      .stat b {
+        display: block;
+        font-size: 18px;
+        letter-spacing: -0.01em;
+      }
+
+      .stat span {
+        display: block;
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.66);
+        font-size: 13px;
+      }
+
+      .heroMedia {
+        overflow: hidden;
+        position: relative;
+        min-height: 320px;
+      }
+
+      .heroMedia::before {
+        content: "";
+        position: absolute;
+        inset: -50px;
+        background: radial-gradient(500px 280px at 30% 30%, rgba(106, 228, 255, 0.25), transparent 60%),
+          radial-gradient(520px 300px at 70% 70%, rgba(167, 139, 250, 0.25), transparent 62%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+        transform: rotate(-6deg);
+      }
+
+      .mediaInner {
+        position: absolute;
+        inset: 0;
+        padding: 18px;
+        display: grid;
+        align-content: end;
+        gap: 10px;
+      }
+
+      .badgeRow {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(0, 0, 0, 0.18);
+        color: rgba(255, 255, 255, 0.86);
+        font-size: 13px;
+      }
+
+      .section {
+        margin-top: 26px;
+      }
+
+      .sectionHeader {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 14px;
+      }
+
+      .sectionHeader p {
+        max-width: 70ch;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      @media (max-width: 980px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .item {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 18px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .itemTop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        flex-shrink: 0;
+      }
+
+      .item h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .muted {
+        color: rgba(255, 255, 255, 0.66);
+      }
+
+      .twoCol {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      @media (max-width: 980px) {
+        .twoCol {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .quote {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .note {
+        margin-top: 14px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.62);
+      }
+
+      .error {
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 120, 120, 0.25);
+        background: rgba(255, 120, 120, 0.08);
+        color: rgba(255, 220, 220, 0.92);
+      }
+
+      .footer {
+        margin-top: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.62);
+        font-size: 13px;
+      }
+
+      .footer a {
+        color: rgba(255, 255, 255, 0.78);
+        text-decoration: none;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      /* Iframe mode */
+      body.iframe-mode {
+        background: #000;
+        overflow: hidden;
+      }
+
+      body.iframe-mode #template {
+        display: none;
+      }
+
+      #iframeRoot {
+        display: none;
+      }
+
+      body.iframe-mode #iframeRoot {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+      }
+
+      #externalFrame {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        outline: none;
+        background: #fff;
+      }
+
+      #debugPanel {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        max-width: min(520px, calc(100vw - 20px));
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.72);
+        color: rgba(255, 255, 255, 0.92);
+        font-size: 12px;
+        line-height: 1.35;
+        z-index: 2147483647;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="template">
+      <div class="topbar">
+        <div class="wrap" style="padding-top: 0; padding-bottom: 0">
+          <div class="nav">
+            <a class="brand" href="#inicio" aria-label="Inicio">
+              <span class="logo" aria-hidden="true"></span>
+              <span class="brandText">
+                <strong>Estética OK</strong>
+                <span>Clínica integral · Facial · Corporal · Piel</span>
+              </span>
+            </a>
+
+            <nav class="navLinks" aria-label="Navegación">
+              <a href="#tratamientos">Tratamientos</a>
+              <a href="#equipo">Equipo</a>
+              <a href="#opiniones">Opiniones</a>
+              <a href="#ubicacion">Ubicación</a>
+            </nav>
+
+            <div class="navRight">
+              <a class="pill" id="demoLink" href="#" title="Ver una demostración del widget en un sitio real">Ver demo</a>
+              <a class="btn primary small" href="#contacto">Agendar evaluación</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wrap" id="inicio">
+        <header class="hero" aria-label="Presentación">
+          <div class="heroGrid">
+            <section class="card">
+              <h1>Resultados naturales con un plan hecho para ti.</h1>
+              <p class="lead">
+                Diagnóstico honesto, tecnología moderna y acompañamiento real. Agenda tu evaluación y te recomendamos el
+                tratamiento ideal según tus objetivos.
+              </p>
+
+              <div class="ctaRow">
+                <a class="btn primary" href="#contacto">Quiero mi evaluación</a>
+                <a class="btn" href="#tratamientos">Ver tratamientos</a>
+              </div>
+
+              <form class="form" id="tryForm" autocomplete="off">
+                <div class="field">
+                  <div class="label">¿Quieres ver cómo se vería este chat en tu sitio?</div>
+                  <div class="inputRow">
+                    <input
+                      class="input"
+                      id="tryUrl"
+                      name="url"
+                      inputmode="url"
+                      placeholder="Pega la URL de tu web (ej: https://clinicamiami.com)"
+                    />
+                    <button class="btn primary" type="submit">Probar ahora</button>
+                  </div>
+                  <div class="help">
+                    Mostramos tu web dentro de esta misma página con el widget encima. Nota: algunas webs bloquean la vista
+                    previa por seguridad.
+                  </div>
+                </div>
+              </form>
+
+              <div class="checks" aria-label="Diferenciales">
+                <div class="checkItem">
+                  <span class="checkDot" aria-hidden="true">✓</span>
+                  <span>Protocolos clínicos + estética natural (sin “efecto relleno”).</span>
+                </div>
+                <div class="checkItem">
+                  <span class="checkDot" aria-hidden="true">✓</span>
+                  <span>Evaluación inicial con plan paso a paso y expectativas realistas.</span>
+                </div>
+                <div class="checkItem">
+                  <span class="checkDot" aria-hidden="true">✓</span>
+                  <span>Seguimiento post-tratamiento y recomendaciones personalizadas.</span>
+                </div>
+              </div>
+
+              <div class="trust" aria-label="Confianza">
+                <div class="stat">
+                  <b>+12</b>
+                  <span>Años de experiencia</span>
+                </div>
+                <div class="stat">
+                  <b>4.9/5</b>
+                  <span>Promedio de reseñas</span>
+                </div>
+                <div class="stat">
+                  <b>+6k</b>
+                  <span>Pacientes atendidos</span>
+                </div>
+                <div class="stat">
+                  <b>48h</b>
+                  <span>Seguimiento posterior</span>
+                </div>
+              </div>
+
+              <p class="note" id="note"></p>
+              <div class="error" id="error" style="display: none"></div>
+            </section>
+
+            <aside class="card heroMedia" aria-label="Promesa de valor">
+              <div class="mediaInner">
+                <div class="badgeRow">
+                  <span class="badge">Atención VIP</span>
+                  <span class="badge">Financiación</span>
+                  <span class="badge">Agenda rápida</span>
+                </div>
+
+                <div class="card soft" style="padding: 16px">
+                  <h2 style="margin-bottom: 8px">Evaluación express</h2>
+                  <p class="muted" style="margin-bottom: 12px">
+                    Habla con el asistente y te ayudamos a: presupuesto aproximado, disponibilidad y dudas frecuentes.
+                  </p>
+                  <div class="ctaRow" style="margin-top: 0">
+                    <a class="btn primary" href="#contacto">Agendar por chat</a>
+                    <a class="btn" href="#opiniones">Ver opiniones</a>
+                  </div>
+                  <p class="note" style="margin-top: 10px">*La atención por chat la gestiona el widget.</p>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </header>
+
+        <section class="section" id="tratamientos" aria-label="Tratamientos">
+          <div class="sectionHeader">
+            <div>
+              <h2>Tratamientos destacados</h2>
+              <p class="muted">Seleccionamos lo adecuado según tu piel, anatomía y objetivos (no vendemos “paquetes”).</p>
+            </div>
+            <a class="btn small" href="#contacto">Consultar disponibilidad</a>
+          </div>
+
+          <div class="grid">
+            <article class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">✨</span>
+                  <h3>Armonización facial</h3>
+                </div>
+              </div>
+              <p class="muted">Perfilado, soporte y simetría con un enfoque natural.</p>
+              <p class="note">Tiempo estimado: 30–60 min · Recuperación: mínima</p>
+            </article>
+
+            <article class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">🫧</span>
+                  <h3>Skin glow & peeling</h3>
+                </div>
+              </div>
+              <p class="muted">Textura, manchas y luminosidad con protocolos por tipo de piel.</p>
+              <p class="note">Incluye: diagnóstico · recomendaciones · seguimiento</p>
+            </article>
+
+            <article class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">⚡</span>
+                  <h3>Corporal no invasivo</h3>
+                </div>
+              </div>
+              <p class="muted">Mejora de firmeza y contorno sin cirugía (según evaluación).</p>
+              <p class="note">Plan por sesiones · control de progreso</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" aria-label="Por qué elegirnos">
+          <div class="sectionHeader">
+            <div>
+              <h2>Por qué eligen Estética OK</h2>
+              <p class="muted">Transparencia, seguridad y resultados que se ven bien en persona (no solo en fotos).</p>
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <div class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">🛡️</span>
+                  <h3>Seguridad primero</h3>
+                </div>
+              </div>
+              <p class="muted">Historia clínica, contraindicaciones y consentimiento informado.</p>
+            </div>
+            <div class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">📋</span>
+                  <h3>Plan personalizado</h3>
+                </div>
+              </div>
+              <p class="muted">Objetivos, tiempos y presupuesto alineados a tu realidad.</p>
+            </div>
+            <div class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">🔬</span>
+                  <h3>Tecnología & técnica</h3>
+                </div>
+              </div>
+              <p class="muted">Equipamiento moderno y protocolos actualizados.</p>
+            </div>
+            <div class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">🤍</span>
+                  <h3>Acompañamiento real</h3>
+                </div>
+              </div>
+              <p class="muted">Seguimiento, cuidado post y resolución de dudas.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="equipo" aria-label="Equipo">
+          <div class="sectionHeader">
+            <div>
+              <h2>Equipo médico</h2>
+              <p class="muted">Profesionales con criterio estético, ética clínica y enfoque natural.</p>
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <article class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">👩‍⚕️</span>
+                  <h3>Dra. Valentina R.</h3>
+                </div>
+                <span class="badge">Facial</span>
+              </div>
+              <p class="muted">Armonización y tratamientos de piel. Enfoque: naturalidad y proporción.</p>
+              <p class="note">Especialidad: estética facial · dermocosmética</p>
+            </article>
+            <article class="item">
+              <div class="itemTop">
+                <div style="display: flex; align-items: center; gap: 12px">
+                  <span class="icon" aria-hidden="true">👨‍⚕️</span>
+                  <h3>Dr. Martín S.</h3>
+                </div>
+                <span class="badge">Corporal</span>
+              </div>
+              <p class="muted">Protocolos corporales y tecnologías no invasivas. Enfoque: seguridad y seguimiento.</p>
+              <p class="note">Especialidad: estética corporal · planes por objetivos</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="opiniones" aria-label="Opiniones">
+          <div class="sectionHeader">
+            <div>
+              <h2>Opiniones reales</h2>
+              <p class="muted">Lo que más valoran: trato humano, claridad y resultados progresivos.</p>
+            </div>
+          </div>
+
+          <div class="grid">
+            <article class="item">
+              <p class="quote">“Me explicaron todo sin venderme de más. El resultado quedó súper natural.”</p>
+              <p class="note">— Sofía M. · Armonización facial</p>
+            </article>
+            <article class="item">
+              <p class="quote">“La piel cambió en 3 semanas con el plan. Me hicieron seguimiento por chat.”</p>
+              <p class="note">— Camila P. · Skin glow</p>
+            </article>
+            <article class="item">
+              <p class="quote">“Muy prolijos y puntuales. Me dieron alternativas según presupuesto.”</p>
+              <p class="note">— Laura G. · Plan corporal</p>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="ubicacion" aria-label="Ubicación y contacto">
+          <div class="sectionHeader">
+            <div>
+              <h2>Ubicación y horarios</h2>
+              <p class="muted">Agenda por chat y te confirmamos turnos disponibles.</p>
+            </div>
+          </div>
+
+          <div class="twoCol">
+            <div class="item">
+              <h3 style="margin: 0 0 8px">Dirección</h3>
+              <p class="muted">Av. Principal 123 · Piso 6 · Centro</p>
+              <p class="note">Estacionamiento cercano · Acceso con ascensor</p>
+            </div>
+            <div class="item">
+              <h3 style="margin: 0 0 8px">Horarios</h3>
+              <p class="muted">Lun–Vie: 9:00–19:00 · Sáb: 9:00–13:00</p>
+              <p class="note">*Horario sujeto a disponibilidad de agenda</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="contacto" aria-label="Agendar">
+          <div class="card">
+            <div class="sectionHeader" style="margin-bottom: 10px">
+              <div>
+                <h2>¿Lista/o para tu evaluación?</h2>
+                <p class="muted">Escríbenos por el chat (widget) y te respondemos con opciones de turno.</p>
+              </div>
+              <a class="btn primary" href="#inicio">Volver arriba</a>
+            </div>
+
+            <div class="twoCol">
+              <div class="item">
+                <h3 style="margin: 0 0 8px">Qué te pediremos</h3>
+                <p class="muted">Objetivo, zona a tratar, antecedentes relevantes y disponibilidad horaria.</p>
+                <p class="note">Tiempo típico de respuesta: minutos (según demanda).</p>
+              </div>
+              <div class="item">
+                <h3 style="margin: 0 0 8px">Cómo empezar</h3>
+                <p class="muted">Toca el botón del widget abajo a la derecha y elige “Escribir por Chat”.</p>
+                <p class="note">Si no ves el widget, revisa que tu navegador no bloquee scripts de terceros.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="footer" aria-label="Pie">
+          <span>© <span id="year"></span> Estética OK · Demo landing</span>
+          <span>
+            <a href="#tratamientos">Tratamientos</a> · <a href="#equipo">Equipo</a> · <a href="#ubicacion">Ubicación</a>
+          </span>
+        </div>
+      </div>
+    </main>
+
+    <div id="iframeRoot" aria-hidden="true">
+      <iframe id="externalFrame" title="Sitio externo" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <div id="debugPanel" hidden></div>
+
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const webParam = params.get("web");
+        const debug = params.get("debug") === "1";
+
+        const yearEl = document.getElementById("year");
+        if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+        const normalizeBackendBase = (raw) => {
+          const fallback = "https://odontolab.co/agentes-conversion";
+          if (!raw) return fallback;
+          const trimmed = String(raw).trim();
+          if (!trimmed) return fallback;
+          try {
+            const u = new URL(trimmed);
+            if (u.protocol !== "http:" && u.protocol !== "https:") return fallback;
+            let base = u.toString();
+            base = base.replace(/\/+$/, "");
+            if (!base.endsWith("/agentes-conversion")) base += "/agentes-conversion";
+            return base;
+          } catch {
+            return fallback;
+          }
+        };
+
+        window.__DEMO_WIDGET_BACKEND_BASE = normalizeBackendBase(params.get("backend"));
+
+        const debugPanel = document.getElementById("debugPanel");
+        const setDebug = (text) => {
+          if (!debug || !debugPanel) return;
+          debugPanel.hidden = false;
+          debugPanel.textContent = text;
+        };
+
+        const errorEl = document.getElementById("error");
+        const noteEl = document.getElementById("note");
+        const demoLink = document.getElementById("demoLink");
+        const tryForm = document.getElementById("tryForm");
+        const tryUrl = document.getElementById("tryUrl");
+        const iframe = document.getElementById("externalFrame");
+
+        const demoUrl = new URL(window.location.href);
+        demoUrl.searchParams.set("web", "https://clinicamiami.com");
+        if (demoLink) {
+          demoLink.href = "#";
+          demoLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = demoUrl.toString();
+          });
+        }
+
+        const showError = (msg) => {
+          if (!errorEl) return;
+          errorEl.style.display = "block";
+          errorEl.textContent = msg;
+        };
+
+        const normalizeWebUrl = (raw) => {
+          if (!raw) return null;
+          const trimmed = String(raw).trim();
+          if (!trimmed) return null;
+
+          // Primero intentamos como URL completa
+          try {
+            const u = new URL(trimmed);
+            return u;
+          } catch {
+            // Si viene sin esquema (ej: clinicamiami.com), asumimos https
+            try {
+              const u = new URL(`https://${trimmed}`);
+              return u;
+            } catch {
+              return null;
+            }
+          }
+        };
+
+        const webUrl = normalizeWebUrl(webParam);
+
+        if (webParam && !webUrl) {
+          showError("La URL ingresada no es válida.");
+        }
+
+        if (webUrl) {
+          if (webUrl.protocol !== "http:" && webUrl.protocol !== "https:") {
+            showError("Solo se permiten URLs http/https.");
+            return;
+          }
+
+          // Evita mixed content cuando esta página está en https.
+          if (webUrl.protocol === "http:" && window.location.protocol === "https:") {
+            webUrl.protocol = "https:";
+          }
+
+          document.body.classList.add("iframe-mode");
+          iframe.src = webUrl.toString();
+          setDebug(
+            [
+              "[debug=1]",
+              `iframe src: ${iframe.src}`,
+              `widget backendBase: ${window.__DEMO_WIDGET_BACKEND_BASE}`,
+              "Si el iframe queda en blanco, es probable que la web bloquee iframes (X-Frame-Options / CSP frame-ancestors).",
+            ].join("\n"),
+          );
+
+          return;
+        }
+
+        if (noteEl) {
+          noteEl.textContent =
+            "Si te interesa este chat para tu negocio, escríbenos por el widget y te mostramos planes y configuración.";
+        }
+
+        if (tryForm && tryUrl) {
+          tryForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const raw = tryUrl.value;
+            const u = normalizeWebUrl(raw);
+            if (!u) {
+              showError("Por favor pega una URL válida (por ejemplo: https://tusitio.com)");
+              tryUrl.focus();
+              return;
+            }
+            const next = new URL(window.location.href);
+            next.searchParams.set("web", u.toString());
+            window.location.href = next.toString();
+          });
+        }
+
+        setDebug(
+          [
+            "[debug=1]",
+            "modo: template",
+            `widget backendBase: ${window.__DEMO_WIDGET_BACKEND_BASE}`,
+          ].join("\n"),
+        );
+      })();
+    </script>
+
+    <!-- Widget (siempre cargado) -->
+    <script type="module">
+      import { RetellWebClient } from "https://esm.sh/retell-client-js-sdk@latest";
+
+      const __SW_BACKEND_BASE =
+        (typeof window !== "undefined" && window.__DEMO_WIDGET_BACKEND_BASE) || "https://odontolab.co/agentes-conversion";
+
+      class SofiaWidget {
+        constructor() {
+          // Backend base
+          this.backendBase = __SW_BACKEND_BASE;
+
+          this.config = {
+            avatarUrl: "https://odontolab.co/wp-content/uploads/2025/12/chatlivepic.webp",
+          };
+
+          this.state = {
+            isOpen: false,
+            mode: null,
+            retellClient: null,
+            chatSessionId: localStorage.getItem("sofia_session_id") || `sess_${Date.now()}`,
+            landingUrl: window.location.href,
+            isAtBottom: true,
+            unseenCount: 0,
+          };
+
+          if (!localStorage.getItem("sofia_session_id")) {
+            localStorage.setItem("sofia_session_id", this.state.chatSessionId);
+          }
+
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", () => this.init());
+          } else {
+            this.init();
+          }
+        }
+
+        init() {
+          this.host = document.createElement("div");
+          this.host.id = "sofia-host-v18";
+          this.host.style.cssText = `
+      position: fixed;
+      bottom: 0; right: 0;
+      width: 0; height: 0;
+      z-index: 2147483647;
+      display: block;
+    `;
+          document.body.appendChild(this.host);
+
+          this.shadow = this.host.attachShadow({ mode: "open" });
+
+          this.injectStyles();
+          this.createDOM();
+          this.setupEventListeners();
+          this.setupVhSizing();
+
+          try {
+            this.state.retellClient = new RetellWebClient();
+            this.setupRetellEvents();
+          } catch (e) {
+            console.error(e);
+          }
+
+          setTimeout(() => {
+            const teaser = this.shadow.getElementById("sw-teaser");
+            if (teaser && !this.state.isOpen) teaser.style.display = "flex";
+          }, 3000);
+        }
+
+        injectStyles() {
+          const style = document.createElement("style");
+          style.textContent = `
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+      :host { all: initial; font-family: 'Inter', sans-serif; display: block; }
+      * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; font-family: 'Inter', sans-serif; }
+
+      .sw-overlay {
+        position: fixed;
+        bottom: 20px; right: 20px;
+        width: 380px; height: 600px;
+        max-height: 85vh;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+      }
+      .sw-overlay.open { display: flex; animation: fadeUp 0.2s ease-out; }
+
+      .sw-view { flex: 1; display: none; flex-direction: column; height: 100%; overflow: hidden; min-height: 0; }
+      .sw-view.active { display: flex; }
+
+      .sw-topbar {
+        flex-shrink: 0;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 10px;
+        background: #fff;
+        border-bottom: 1px solid #f1f5f9;
+      }
+
+      .sw-close-btn {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        color: #64748b;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .sw-menu {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px;
+        text-align: center;
+      }
+      .sw-av-big { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 20px; }
+      .sw-title { font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+      .sw-sub { font-size: 15px; color: #64748b; margin-bottom: 30px; line-height: 1.5; }
+      .sw-btn-col { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+      .sw-btn {
+        width: 100%;
+        padding: 18px;
+        border-radius: 14px;
+        border: none;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .sw-btn-blue { background: #2563eb; color: #fff; box-shadow: 0 4px 15px rgba(37,99,235,0.3); }
+      .sw-btn-gray { background: #f8fafc; color: #0f172a; border: 1px solid #e2e8f0; }
+
+      .sw-chat-layout {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: #fff;
+        overflow: hidden;
+        min-height: 0;
+      }
+
+      .sw-chat-head {
+        flex-shrink: 0;
+        padding: 12px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        background: #fff;
+      }
+      .sw-chat-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+      .sw-av-sm { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+      .sw-chat-meta { min-width: 0; }
+      .sw-name { font-weight: 700; color: #0f172a; font-size: 15px; line-height: 1.1; }
+      .sw-on { color: #10b981; font-size: 12px; font-weight: 600; line-height: 1.1; margin-top: 2px; }
+
+      .sw-msg-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 15px 15px 20px 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #f8fafc;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        justify-content: flex-end;
+      }
+      #sw-end { height: 1px; width: 100%; }
+
+      .sw-msg { max-width: 85%; padding: 12px 16px; border-radius: 16px; font-size: 15px; line-height: 1.4; word-wrap: break-word; }
+      .sw-bot { background: #f1f5f9; color: #0f172a; align-self: flex-start; border-bottom-left-radius: 2px; }
+      .sw-user { background: #2563eb; color: #fff; align-self: flex-end; border-bottom-right-radius: 2px; }
+
+      .sw-input-dock {
+        flex-shrink: 0;
+        padding: 10px 15px calc(15px + env(safe-area-inset-bottom));
+        background: #fff;
+        border-top: 1px solid #f1f5f9;
+      }
+      .sw-typing { font-size: 12px; color: #94a3b8; margin-bottom: 8px; display: none; padding-left: 5px; }
+      .sw-input-row { display: flex; gap: 10px; align-items: center; }
+      .sw-input {
+        flex: 1;
+        height: 44px;
+        border-radius: 22px;
+        border: 1px solid #dbe3ef;
+        padding: 0 20px;
+        font-size: 16px;
+        color: #0f172a;
+        background: #fff;
+      }
+      .sw-send-btn {
+        width: 44px; height: 44px;
+        border-radius: 50%;
+        background: #2563eb;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 6px 18px rgba(37,99,235,.25);
+      }
+      .sw-send-btn svg { width: 20px; height: 20px; fill: #fff; display: block; }
+
+      .sw-new {
+        position: absolute;
+        right: 14px;
+        bottom: calc(76px + env(safe-area-inset-bottom));
+        display: none;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border-radius: 999px;
+        border: 1px solid #dbe3ef;
+        background: #ffffff;
+        color: #0f172a;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+        user-select: none;
+      }
+      .sw-new .sw-badge {
+        min-width: 18px;
+        height: 18px;
+        padding: 0 6px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #2563eb;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+
+      .sw-launcher { position: fixed; bottom: 20px; right: 20px; cursor: pointer; width: 65px; height: 65px; z-index: 99990; }
+      .sw-ring { width: 100%; height: 100%; border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); position: relative; }
+      .sw-av-launcher { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+      .sw-dot { position: absolute; bottom: 0; right: 0; width: 16px; height: 16px; background: #10b981; border: 3px solid #fff; border-radius: 50%; }
+
+      .sw-mob-bar {
+        display: none;
+        position: fixed;
+        bottom: 0; left: 0;
+        width: 100%;
+        background: #fff;
+        height: 70px;
+        border-top: 1px solid #eee;
+        align-items: center;
+        padding: 0 15px;
+        cursor: pointer;
+        z-index: 99999;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      }
+      .sw-mob-info { flex: 1; margin-left: 12px; }
+      .sw-mob-cta { background: #2563eb; color: #fff; padding: 8px 20px; border-radius: 20px; font-weight: 600; font-size: 14px; }
+
+      .sw-teaser {
+        position: fixed;
+        bottom: 95px; right: 20px;
+        background: #fff;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        width: 260px;
+        display: none;
+        align-items: flex-start;
+        z-index: 99980;
+      }
+      .sw-teaser-text { font-size: 14px; color: #334155; line-height: 1.4; }
+      .sw-teaser-x { position: absolute; top: 5px; right: 8px; color: #94a3b8; cursor: pointer; }
+
+      @media (max-width: 480px) {
+        .sw-launcher, .sw-teaser { display: none !important; }
+        .sw-mob-bar { display: flex; }
+
+        .sw-overlay {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          right: 0 !important;
+          bottom: auto !important;
+          width: 100vw !important;
+          height: calc(var(--sw-vh, 1vh) * 100) !important;
+          max-height: none !important;
+          border-radius: 0 !important;
+          border: none !important;
+          margin: 0 !important;
+          animation: none !important;
+        }
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    `;
+          this.shadow.appendChild(style);
+        }
+
+        createDOM() {
+          const div = document.createElement("div");
+          const avatar = this.config.avatarUrl;
+
+          div.innerHTML = `
+      <div id="sw-teaser" class="sw-teaser">
+        <div class="sw-teaser-x">×</div>
+        <div class="sw-teaser-text">Hola, ¿quieres que te de un presupuesto estimado para tus implantes?</div>
+      </div>
+
+      <div id="sw-launcher" class="sw-launcher">
+        <div class="sw-ring">
+          <img src="${avatar}" class="sw-av-launcher">
+          <div class="sw-dot"></div>
+        </div>
+      </div>
+
+      <div id="sw-mob-bar" class="sw-mob-bar">
+        <div style="width:45px; height:45px; position:relative;">
+          <img src="${avatar}" class="sw-av-launcher">
+          <div class="sw-dot" style="width:12px; height:12px;"></div>
+        </div>
+        <div class="sw-mob-info">
+          <div style="font-weight:700; color:#0f172a; font-size:16px;">Sofía</div>
+          <div style="color:#10b981; font-size:13px; font-weight:500;">En línea ahora</div>
+        </div>
+        <div class="sw-mob-cta">Hablar ahora</div>
+      </div>
+
+      <div id="sw-overlay" class="sw-overlay">
+        <div id="v-menu" class="sw-view active">
+          <div class="sw-topbar">
+            <button class="sw-close-btn sw-close" aria-label="Cerrar">✕</button>
+          </div>
+          <div class="sw-menu">
+            <img src="${avatar}" class="sw-av-big">
+            <div class="sw-title">Hola, soy Sofía</div>
+            <div class="sw-sub">Coordinadora de citas. Para darte precios y disponibilidad, ¿cómo prefieres hablar?</div>
+            <div class="sw-btn-col">
+              <button id="btn-voice" class="sw-btn sw-btn-blue">Llamada de Voz (Gratis)</button>
+              <button id="btn-chat" class="sw-btn sw-btn-gray">Escribir por Chat</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="v-chat" class="sw-view">
+          <div class="sw-chat-layout">
+            <div class="sw-chat-head">
+              <div class="sw-chat-left">
+                <img src="${avatar}" class="sw-av-sm">
+                <div class="sw-chat-meta">
+                  <div class="sw-name">Sofía</div>
+                  <div class="sw-on">● En línea</div>
+                </div>
+              </div>
+              <button class="sw-close-btn sw-close" aria-label="Cerrar">✕</button>
+            </div>
+
+            <div id="sw-msgs" class="sw-msg-list">
+              <div id="sw-end"></div>
+            </div>
+
+            <button id="sw-new" class="sw-new" type="button">
+              Ver nuevos <span id="sw-badge" class="sw-badge">1</span>
+            </button>
+
+            <div class="sw-input-dock">
+              <div id="sw-typing" class="sw-typing">Escribiendo...</div>
+              <div class="sw-input-row">
+                <input type="text" id="sw-input" class="sw-input" placeholder="Escribe aquí...">
+                <button id="sw-send" class="sw-send-btn" aria-label="Enviar">
+                  <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="v-call" class="sw-view">
+          <div class="sw-topbar">
+            <button class="sw-close-btn sw-close" aria-label="Cerrar">✕</button>
+          </div>
+          <div class="sw-menu">
+            <img src="${avatar}" style="width:80px; height:80px; border-radius:50%;">
+            <h3 style="margin-top:20px; font-weight:700;">Llamada Segura</h3>
+            <div id="call-viz" style="font-size:50px; margin:30px 0;">🎙️</div>
+            <div id="call-status" style="color:#64748b; margin-bottom:30px;">Conectando...</div>
+            <button id="btn-hangup" class="sw-btn sw-btn-blue" style="background:#ef4444; width:auto; padding:12px 30px; border-radius:50px;">
+              Finalizar
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+          this.shadow.appendChild(div);
+        }
+
+        isNearBottom(threshold = 40) {
+          const msgs = this.shadow.getElementById("sw-msgs");
+          if (!msgs) return true;
+          const distance = msgs.scrollHeight - msgs.scrollTop - msgs.clientHeight;
+          return distance <= threshold;
+        }
+
+        showNewIndicator() {
+          const btn = this.shadow.getElementById("sw-new");
+          const badge = this.shadow.getElementById("sw-badge");
+          if (!btn || !badge) return;
+          badge.textContent = String(this.state.unseenCount);
+          btn.style.display = "inline-flex";
+        }
+
+        hideNewIndicator() {
+          const btn = this.shadow.getElementById("sw-new");
+          if (!btn) return;
+          btn.style.display = "none";
+        }
+
+        resetNewIndicator() {
+          this.state.unseenCount = 0;
+          this.hideNewIndicator();
+        }
+
+        scrollToBottom(behavior = "auto") {
+          if (this.state.mode !== "CHAT") return;
+          const msgs = this.shadow.getElementById("sw-msgs");
+          const end = this.shadow.getElementById("sw-end");
+          if (!msgs) return;
+
+          msgs.scrollTop = msgs.scrollHeight;
+          if (end) {
+            try {
+              end.scrollIntoView({ block: "end", behavior });
+            } catch (_) {}
+          }
+          this.state.isAtBottom = true;
+          this.resetNewIndicator();
+        }
+
+        setupEventListeners() {
+          const el = (id) => this.shadow.getElementById(id);
+          const toggle = () => this.toggleOpen();
+
+          el("sw-launcher")?.addEventListener("click", toggle);
+          el("sw-mob-bar")?.addEventListener("click", toggle);
+
+          this.shadow.querySelectorAll(".sw-close").forEach((btn) => {
+            btn.addEventListener("click", () => this.toggleOpen(false));
+          });
+
+          this.shadow.querySelector(".sw-teaser-x")?.addEventListener("click", (e) => {
+            e.stopPropagation();
+            el("sw-teaser").style.display = "none";
+          });
+
+          el("btn-voice")?.addEventListener("click", () => this.switchMode("CALL"));
+          el("btn-chat")?.addEventListener("click", () => this.switchMode("CHAT"));
+
+          el("sw-send")?.addEventListener("click", () => this.sendChatMessage());
+          el("sw-input")?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") this.sendChatMessage();
+          });
+
+          el("sw-input")?.addEventListener("focus", () => {
+            if (this.isNearBottom()) {
+              setTimeout(() => this.scrollToBottom("auto"), 0);
+              setTimeout(() => this.scrollToBottom("auto"), 120);
+            }
+          });
+
+          el("sw-new")?.addEventListener("click", () => this.scrollToBottom("smooth"));
+
+          el("sw-msgs")?.addEventListener("scroll", () => {
+            const atBottom = this.isNearBottom();
+            this.state.isAtBottom = atBottom;
+            if (atBottom) this.resetNewIndicator();
+          });
+
+          el("btn-hangup")?.addEventListener("click", () => this.stopCall());
+        }
+
+        setupVhSizing() {
+          const setVh = () => {
+            const h = window.visualViewport?.height || window.innerHeight;
+            this.host.style.setProperty("--sw-vh", `${h * 0.01}px`);
+            if (this.state.isOpen && this.state.mode === "CHAT" && this.state.isAtBottom) {
+              setTimeout(() => this.scrollToBottom("auto"), 0);
+            }
+          };
+          setVh();
+          window.addEventListener("resize", setVh);
+          window.addEventListener("orientationchange", setVh);
+          window.visualViewport?.addEventListener("resize", setVh);
+        }
+
+        toggleOpen(force) {
+          const overlay = this.shadow.getElementById("sw-overlay");
+          const mobBar = this.shadow.getElementById("sw-mob-bar");
+          const teaser = this.shadow.getElementById("sw-teaser");
+          const launcher = this.shadow.getElementById("sw-launcher");
+
+          this.state.isOpen = force !== undefined ? force : !this.state.isOpen;
+
+          if (this.state.isOpen) {
+            overlay.classList.add("open");
+            if (mobBar) mobBar.style.display = "none";
+            if (teaser) teaser.style.display = "none";
+            if (launcher && window.innerWidth > 480) launcher.style.display = "none";
+            if (!this.state.mode) this.switchMode("MENU");
+          } else {
+            overlay.classList.remove("open");
+            if (window.innerWidth <= 480 && mobBar) mobBar.style.display = "flex";
+            if (launcher && window.innerWidth > 480) launcher.style.display = "";
+            this.resetNewIndicator();
+            this.state.isAtBottom = true;
+            if (this.state.retellClient) this.state.retellClient.stopCall();
+            setTimeout(() => this.switchMode("MENU"), 250);
+          }
+        }
+
+        switchMode(mode) {
+          this.state.mode = mode;
+          this.shadow.querySelectorAll(".sw-view").forEach((el) => el.classList.remove("active"));
+
+          if (mode === "MENU") {
+            this.shadow.getElementById("v-menu").classList.add("active");
+          } else if (mode === "CALL") {
+            this.shadow.getElementById("v-call").classList.add("active");
+            this.startCall();
+          } else if (mode === "CHAT") {
+            this.shadow.getElementById("v-chat").classList.add("active");
+            const msgs = this.shadow.getElementById("sw-msgs");
+            if (msgs && msgs.children.length <= 1) this.triggerChatWelcome();
+            requestAnimationFrame(() => this.scrollToBottom("auto"));
+            setTimeout(() => this.scrollToBottom("auto"), 80);
+          }
+        }
+
+        async startCall() {
+          const status = this.shadow.getElementById("call-status");
+          status.textContent = "Solicitando micrófono...";
+
+          try {
+            this.state.retellClient.stopCall();
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            status.textContent = "Conectando...";
+
+            const res = await fetch(`${this.backendBase}/create-call.php`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                landingurl: this.state.landingUrl,
+                chatsessionid: this.state.chatSessionId,
+              }),
+            });
+
+            const data = await res.json();
+            if (!data?.access_token) throw new Error("No access_token");
+
+            status.textContent = "Audio conectado";
+
+            await this.state.retellClient.startCall({
+              accessToken: data.access_token,
+              sampleRate: 24000,
+              captureDeviceId: "default",
+              playbackDeviceId: "default",
+            });
+          } catch (err) {
+            status.textContent = "Error Micrófono/Conexión";
+          }
+        }
+
+        stopCall() {
+          if (this.state.retellClient) this.state.retellClient.stopCall();
+          this.switchMode("MENU");
+        }
+
+        setupRetellEvents() {
+          const viz = this.shadow.getElementById("call-viz");
+          this.state.retellClient.on("agent_start_talking", () => (viz.textContent = "🔊"));
+          this.state.retellClient.on("agent_stop_talking", () => (viz.textContent = "👂"));
+          this.state.retellClient.on("call_ended", () => this.stopCall());
+        }
+
+        appendMessage(text, sender) {
+          const box = this.shadow.getElementById("sw-msgs");
+          const end = this.shadow.getElementById("sw-end");
+          if (!box) return;
+
+          const wasAtBottom = this.isNearBottom();
+
+          const div = document.createElement("div");
+          div.className = `sw-msg ${sender === "user" ? "sw-user" : "sw-bot"}`;
+          div.innerHTML = text
+            .replace(/(https?:\/\/[^\s]+)/g, (url) =>
+              `<a href="${url}" target="_blank" style="color:inherit; text-decoration: underline;">${url}</a>`,
+            )
+            .replace(/\n/g, "<br>");
+
+          if (end) box.insertBefore(div, end);
+          else box.appendChild(div);
+
+          requestAnimationFrame(() => {
+            if (sender === "user") {
+              this.scrollToBottom("auto");
+              return;
+            }
+
+            if (wasAtBottom) {
+              this.scrollToBottom("auto");
+            } else {
+              this.state.isAtBottom = false;
+              this.state.unseenCount += 1;
+              this.showNewIndicator();
+            }
+          });
+        }
+
+        toggleTyping(show) {
+          this.shadow.getElementById("sw-typing").style.display = show ? "block" : "none";
+        }
+
+        async sendChatMessage() {
+          const input = this.shadow.getElementById("sw-input");
+          const text = input.value.trim();
+          if (!text) return;
+
+          this.appendMessage(text, "user");
+          input.value = "";
+          this.toggleTyping(true);
+
+          try {
+            const res = await fetch(`${this.backendBase}/chat.php`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                mensaje: text,
+                chatsessionid: this.state.chatSessionId,
+                landingurl: this.state.landingUrl,
+              }),
+            });
+
+            const data = await res.json();
+            this.toggleTyping(false);
+
+            if (Array.isArray(data)) {
+              data.forEach((item) => item.output && this.appendMessage(item.output, "bot"));
+            } else if (data.output) {
+              this.appendMessage(data.output, "bot");
+            } else if (typeof data === "string") {
+              this.appendMessage(data, "bot");
+            }
+          } catch (error) {
+            this.toggleTyping(false);
+            this.appendMessage("Error de conexión.", "bot");
+          }
+        }
+
+        triggerChatWelcome() {
+          setTimeout(() => {
+            this.toggleTyping(true);
+            setTimeout(() => {
+              this.toggleTyping(false);
+              this.appendMessage(
+                `Hola, soy Sofía, coordinadora de citas para Implant Center SLP para el Dr. Ismael Espinosa y el Dr. Christian Idiaquez.\n\n¿Cuántas piezas dentales buscas reemplazar para agendar tu valoración?`,
+                "bot",
+              );
+              setTimeout(() => this.scrollToBottom("auto"), 50);
+            }, 1200);
+          }, 300);
+        }
+      }
+
+      new SofiaWidget();
+    </script>
+  </body>
+</html>
