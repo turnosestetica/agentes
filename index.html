@@ -1023,6 +1023,9 @@
 
     <!-- Widget (siempre cargado) -->
     <script type="module">
+      // Fuerza backend para Clínica Estética CG antes de instanciar el widget
+      window.AGENTES_BACKEND = "https://odontolab.co/agentes-conversion/clinica-estetica-cg";
+
       import { RetellWebClient } from "https://esm.sh/retell-client-js-sdk@latest";
 
       const __SW_BACKEND_BASE =
@@ -1719,5 +1722,8 @@
 
       new SofiaWidget();
     </script>
+    <!-- Widget Clínica Estética CG -->
+    <script>window.AGENTES_BACKEND="https://odontolab.co/agentes-conversion/clinica-estetica-cg";</script>
+    <script type="module" src="https://odontolab.co/agentes-conversion/agentes-conversion-widget-v18.js"></script>
   </body>
 </html>
