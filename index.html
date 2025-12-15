@@ -1023,6 +1023,8 @@
 
     <!-- Widget (siempre cargado) -->
     <script type="module">
+      // Desactivado: se usa widget remoto desde Hostinger
+      if (false) {
       // Fuerza backend para Clínica Estética CG antes de instanciar el widget
       window.AGENTES_BACKEND = "https://odontolab.co/agentes-conversion/clinica-estetica-cg";
 
@@ -1353,7 +1355,7 @@
           div.innerHTML = `
       <div id="sw-teaser" class="sw-teaser">
         <div class="sw-teaser-x">×</div>
-        <div class="sw-teaser-text">Hola, ¿quieres que te de un presupuesto estimado para tus implantes?</div>
+        <div class="sw-teaser-text">Hola, ¿cómo te puedo ayudar?</div>
       </div>
 
       <div id="sw-launcher" class="sw-launcher">
@@ -1721,9 +1723,10 @@
       }
 
       new SofiaWidget();
+      }
     </script>
     <!-- Widget Clínica Estética CG (carga remota con CORS abierto) -->
     <script>window.AGENTES_BACKEND="https://odontolab.co/agentes-conversion/clinica-estetica-cg";</script>
-    <script type="module" src="https://odontolab.co/agentes-conversion/clinica-estetica-cg/widget.php"></script>
+    <script type="module" src="https://odontolab.co/agentes-conversion/clinica-estetica-cg/widget.php?v=20251215d"></script>
   </body>
 </html>
